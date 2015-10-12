@@ -1,3 +1,7 @@
 [p].
-jd.
-lfg.
+q.
+[
+    [1, p, premise],
+    [2, imp(p, q)],
+    [3, q, impel(1)]
+].

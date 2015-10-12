@@ -6,17 +6,19 @@
 
 
 verify(InputFileName) :-
-    see(InputFileName),
-    writeln(InputFileName),
-    read(Prems),
-    read(Proof),
-    process(Prems),
-    process(Proof),
-    %% read(Goal),
-    %% read(Proof),
-    seen.
-    %valid_proof(Prems, Goal, Proof).
+    see(InputFileName), read(Prems), read(Goal), read(Proof),
+    seen,
+    valid_proof(Prems, Goal, Proof).
 
-process(end-of-file) :- !.
-process(Data) :- 
-    writeln(Data).
+valid_proof(Prems, Goal, Proof) :-
+    check_goal(Goal, Proof)
+    .
+
+%% iterate() :-
+    
+
+%% Checks if the last line of proof matches with goal 
+check_goal(Goal, Proof) :-
+    last(Proof, ProofLine),         %% Gets the last line of proof.
+    nth0(1, ProofLine, GoalMatch),  %% Extracts the middle part of the line.
+    Goal = GoalMatch.               %% Checks if Goal matches the last line of proof.
