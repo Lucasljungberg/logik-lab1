@@ -5,5 +5,5 @@ r.
     [2, imp(p, q), premise],
     [3, imp(q, r), premise],
     [4, q, impel(1,2)],
-    [5, r, impel(4,3)]
+    [5, r, impel(1,2,3)]
 ].

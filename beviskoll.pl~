@@ -52,12 +52,3 @@ check_proof(_, [Nr, X, Rule], Proof) :-
     
 check_rule(Action, impel(X,Y), Proof) :-
     check_lines(Action, X, Y, impel(X,Y), Proof), !. 
-    
-    
-    
-    
-    
-    
-    
-    
-    
