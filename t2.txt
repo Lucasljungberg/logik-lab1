@@ -1,0 +1,9 @@
+[imp(and(x,y), z), x, y].
+z.
+[
+    [1,imp(and(x,y),z), premise],
+    [2, x, premise],
+    [3, y, premise],
+    [4, and(x,y), andel(2,3)],
+    [5, z, impel(4,1)]
+].

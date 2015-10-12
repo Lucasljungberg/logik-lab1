@@ -1,0 +1,9 @@
+[imp(or(x,y), z), x, y].
+z.
+[
+    [1,imp(or(x,y),z), premise],
+    [2, x, premise],
+    [3, y, premise],
+    [4, or(x,y), orel(2,3)],
+    [5, z, impel(4,1)]
+].
