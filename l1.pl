@@ -25,13 +25,13 @@ iterate(Prems, [Head | Tail], Proof) :-
 box_iterator(_, [], _) :- !.
 box_iterator(StartRowNr, [BoxHead | BoxTail], Proof) :-
 	check_proof(_, BoxHead, Proof),
-	box_iterator(StartRowNr, BoxTail, [BoxHead | Proof]), !.
+	box_iterator(StartRowNr, BoxTail, [Proof | BoxHead]), !.
     
 find_nth(N, [Head | Tail], Row) :-
 	nth0(0, Head, Nr),
 	N = Nr,
 	Head = Row, !.
-find_nth(N, [[ [Nr, Action, assumption] | BoxTail] | _ ], Row) :-
+find_nth(N, [ [ [Nr, Action, assumption] | BoxTail ] | _ ], Row) :-
 	find_nth(N, [ [Nr, Action, assumption] | BoxTail], Row), !.
 find_nth(N, [Head| Tail], Row):-
 	find_nth(N, Tail, Row), !.
@@ -45,8 +45,7 @@ check_lines(_, Line1, Line2, _, Proof, Action1, Action2) :-
     nth0(1, Proof2, Action2).
     
 check_lines(_, Line, _, Proof, Action) :-
-    Row is Line - 1,
-    nth0(Row, Proof, ProofRow),
+    find_nth(Line, Proof, ProofRow),
     nth0(1, ProofRow, Action).
     
 
@@ -85,7 +84,7 @@ check_rule(Action, impel(X,Y), Proof) :-
     imp(Action1, Action) = Action2, !. 
     
 check_rule(Action, impint(X,Y), Proof) :-
-    check_lines(Action, X, Y, impint(X,Y), Copy1, Copy2),
+    check_lines(Action, X, Y, impint(X,Y), Proof, Copy1, Copy2),
     imp(Copy1, Copy2) = Action.
 
 %% Checks that and elimination is done correctly (May need tweek)
@@ -95,7 +94,7 @@ check_rule(Action, andel(X,Y), Proof) :-
     ,!.
     
 check_rule(Action, copy(X), Proof) :-
-    check_lines(Action, X, copy(X), Proof, Copied),
+    check_lines(_, X, _, Proof, Copied),
     Action = Copied. 
     
 check_rule(Action, andint(X, Y), Proof) :-
@@ -103,12 +102,12 @@ check_rule(Action, andint(X, Y), Proof) :-
     (Action = and(Copy1, Copy2) ; Action = and(Copy2, Copy1)).
 
 check_rule(Action, andel1(X), Proof) :-
-    check_lines(Action, X, andel1(X), Proof, Copied),
-    (Copied = and(X, Y) ; Copied = and(Y,X)).
+    check_lines(Action, X, andel1(X), Proof, Copied),           %%%%%%%%%%%%%%%%%%%
+    (Copied = and(Action,Y) ; Copied = and(Y,Action)).
 
 check_rule(Action, andel2(X), Proof) :-
     check_lines(Action, X, andel1(X), Proof, Copied),
-    (Copied = and(X, Y) ; Copied = and(Y,X)).
+    (Copied = and(Action, Y) ; Copied = and(Y,Action)).
 
 check_rule(Action, negel(X, Y), Proof) :-
     check_lines(Action, X, Y, negel(X,Y), Proof, Copy1, Copy2),
@@ -133,7 +132,8 @@ check_rule(Action, mt(X, Y), Proof) :-
     Action = neg(B).
 
 
-    
+check_rule(Action, orel(R, X, Y, A, B), Proof) :-
+
     
 
     
