@@ -20,18 +20,27 @@ valid_proof(Goal, Proof) :-
 iterate(_, [], _) :- !.
 iterate(Prems, [Head | Tail], Proof) :-
     check_proof(Prems, Head, Proof),
-    iterate(Prems, Tail, Proof).
+    iterate(Prems, Tail, Proof), !.
+
+box_iterator(_, [], _) :- !.
+box_iterator(StartRowNr, [BoxHead | BoxTail], Proof) :-
+	check_proof(_, BoxHead, Proof),
+	box_iterator(StartRowNr, BoxTail, [BoxHead | Proof]), !.
     
-box_iterator(StartRow, Box) :-
-    
-    
+find_nth(N, [Head | Tail], Row) :-
+	nth0(0, Head, Nr),
+	N = Nr,
+	Head = Row, !.
+find_nth(N, [[ [Nr, Action, assumption] | BoxTail] | _ ], Row) :-
+	find_nth(N, [ [Nr, Action, assumption] | BoxTail], Row), !.
+find_nth(N, [Head| Tail], Row):-
+	find_nth(N, Tail, Row), !.
+find_nth(N, [], Row):- !.
 
 %% Extracts the proof from the given lines
 check_lines(_, Line1, Line2, _, Proof, Action1, Action2) :-
-    Row1 is Line1 - 1,
-    Row2 is Line2 - 1,
-    nth0(Row1, Proof, Proof1),  %% Loads the proofrows from the specified lines
-    nth0(Row2, Proof, Proof2),
+    find_nth(Line1, Proof, Proof1),  %% Loads the proofrows from the specified lines
+    find_nth(Line2, Proof, Proof2),
     nth0(1, Proof1, Action1),   %% Loads the action from each line
     nth0(1, Proof2, Action2).
     
@@ -63,9 +72,8 @@ check_proof(_, [_, and(X,Y), Rule], Proof) :-
 check_proof(_, [_, imp(X,Y), Rule], Proof) :-
     check_rule(imp(X,Y), Rule, Proof), !.
 
-check_proof(Prems, [[Nr, Assumption, assumption] | Tail], Proof) :-
-    writeln(Assumption),
-    iterate(Prems, Tail, Tail).
+check_proof(Prems, [[Nr, Box, assumption] | Tail], Proof) :-
+    box_iterator(Nr, Tail, Proof).
 
 %% Matches for single-element actions
 check_proof(_, [_, X, Rule], Proof) :-
@@ -124,7 +132,7 @@ check_rule(Action, mt(X, Y), Proof) :-
     Copy2 = neg(A),
     Action = neg(B).
 
-    
+
     
     
 

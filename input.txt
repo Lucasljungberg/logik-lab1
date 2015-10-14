@@ -4,6 +4,10 @@ r.
     [1, p, premise],
     [2, imp(p, q), premise],
     [3, imp(q, r), premise],
-    [4, q, impel(1,2)],
-    [5, r, impel(4,3)]
+    [
+        [4, p, assumption],
+        [5, q, impel(4, 2)]
+    ],
+    [6, q, impel(1,2)],
+    [7, r, impel(4,3)]
 ].
