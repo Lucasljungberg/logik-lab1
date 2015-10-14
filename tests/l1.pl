@@ -78,15 +78,12 @@ check_proof(_, [Nr, X, Rule], Proof) :-
     
 %% Checks that implication elimination is done correctly
 check_rule(Nr, Action, impel(X,Y), Proof) :-
-    writeln(X), 
-    writeln(Y),
-    writeln(Nr),
     not(X > Nr), (Y > Nr),
     check_lines(Action, X, Y, impel(X,Y), Proof, Action1, Action2),
     imp(Action1, Action) = Action2, !. 
     
 check_rule(Nr, Action, impint(X,Y), Proof) :-
-    (Nr > X), (Nr > Y),
+    not(X > Nr), (Y > Nr),
     check_lines(Action, X, Y, impint(X,Y), Proof, Copy1, Copy2),
     imp(Copy1, Copy2) = Action.
 
