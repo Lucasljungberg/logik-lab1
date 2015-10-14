@@ -55,10 +55,8 @@ check_proof(_, [_, and(X,Y), Rule], Proof) :-
 check_proof(_, [_, imp(X,Y), Rule], Proof) :-
     check_rule(imp(X,Y), Rule, Proof), !.
 
-%% Matches for disjunction
-check_proof(_, [_, or(X,Y), Rule], Proof) :-
-    check_rule(or(X,Y), Rule, Proof)
-    ,!. 
+check_proof(Prems, [[Nr, Assumption, assumption] | Tail], Proof) :-
+    iterate(Prems, Tail, Tail).
 
 %% Matches for single-element actions
 check_proof(_, [_, X, Rule], Proof) :-
@@ -74,19 +72,3 @@ check_rule(Action, andel(X,Y), Proof) :-
     check_lines(Action, X, Y, andel(X,Y), Proof, Action1, Action2),
     (and(Action1, Action2) = Action ; and(Action2, Action1) = Action)
     ,!.
-
-check_rule(Action, orel(X,Y), Proof) :-
-    check_lines(Action, X, Y, orel(X,Y), Proof, Action1, Action2),
-    (or(Action1, Action2) = Action ; and(Action2, Action1) = Action),
-    !.
-
-
-    
-    
-    
-    
-    
-    
-    
-    
-    
