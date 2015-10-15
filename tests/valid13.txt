@@ -7,7 +7,3 @@ q.
   [2, and(p,q),             negnegel(1)],
   [3, q,                    andel2(2) ]
 ].
-
-check_rule(Action, orint1(X), Proof) :-
-    check_lines(Action, X, orint1(X), Proof, Copied),
-    Copied = or(Action, Y) ; Copied = or(Y, Action), !.
