@@ -22,14 +22,17 @@ iterate(Prems, [Head | Tail], Proof) :-
     check_proof(Prems, Head, Proof),
     iterate(Prems, Tail, Proof), !.
 
+%% Iterates through a box
 box_iterator([], _) :- !.
 box_iterator([BoxHead | BoxTail], Proof) :-
 	check_proof(_, BoxHead, Proof),
 	box_iterator(BoxTail, [Proof | BoxHead]), !.
     
+%% Appends the first list with the second list
 append_list([],List,List).                            
 append_list([Head | FirstTail], List2, [Head|NewTail]) :- append(FirstTail,List2,NewTail).
 
+%% Gets the row with the specified number
 find_nth(N, [Head | _], Row) :-
 	nth0(0, Head, Nr),
 	N = Nr,
@@ -41,22 +44,14 @@ find_nth(N, [_| Tail], Row):-
 	find_nth(N, Tail, Row), !.
 find_nth(_, [], _).
 
-is_in_scope(Row, [Head | _]) :-
-    nth0(0, Head, Nr),
-    Row = Nr, !.
-is_in_scope(Row, [ _ | Tail]) :-
-    is_in_scope(Row, Tail), !.
-is_in_scope(_, []).
-
 %% Extracts the proof from the given lines
 check_lines(_, Line1, Line2, _, Proof, Action1, Action2) :-
-    is_in_scope(Line1, Proof),
-    is_in_scope(Line2, Proof),
     find_nth(Line1, Proof, Proof1),  %% Loads the proofrows from the specified lines
     find_nth(Line2, Proof, Proof2),
     nth0(1, Proof1, Action1),   %% Loads the action from each line
     nth0(1, Proof2, Action2).
     
+%% Extracts the proof from the given line if only one was given
 check_lines(_, Line, _, Proof, Action) :-
     find_nth(Line, Proof, ProofRow),
     nth0(1, ProofRow, Action).
@@ -95,48 +90,56 @@ check_rule(Nr, Action, impel(X,Y), Proof) :-
     check_lines(Action, X, Y, impel(X,Y), Proof, Action1, Action2),
     imp(Action1, Action) = Action2, !. 
     
+%% Checks that implication introduction is done correctly
 check_rule(Nr, Action, impint(X,Y), Proof) :-
     (Nr > X), (Nr > Y),
     check_lines(Action, X, Y, impint(X,Y), Proof, Copy1, Copy2),
     imp(Copy1, Copy2) = Action.
 
-%% Checks that and elimination is done correctly (May need tweek)
+%% Checks that and elimination is done correctly
 check_rule(Nr, Action, andel(X,Y), Proof) :-
     (Nr > X), (Nr > Y),
     check_lines(Action, X, Y, andel(X,Y), Proof, Action1, Action2),
     (and(Action1, Action2) = Action ; and(Action2, Action1) = Action)
     ,!.
     
+%% Checks that the copy rule is done correctly
 check_rule(Nr, Action, copy(X), Proof) :-
     (Nr > X),
     check_lines(_, X, _, Proof, Copied),
     Action = Copied. 
     
+%% Matches and checks that and introduction is done correctly
 check_rule(Nr, Action, andint(X, Y), Proof) :-
     Nr > X, (Nr > Y),
     check_lines(Action, X, Y, andint(X,Y), Proof, Copy1, Copy2),
     (Action = and(Copy1, Copy2) ; Action = and(Copy2, Copy1)).
 
+%% Matches andel1 and checks if and elimination 1 is done correctly
 check_rule(Nr, Action, andel1(X), Proof) :-
     (Nr > X),
     check_lines(Action, X, andel1(X), Proof, Copied), 
     (Copied = and(Action,_)).
 
+%% Matches andel2 and checks if and elimination 2 is done correctly
 check_rule(Nr, Action, andel2(X), Proof) :-
     (Nr > X),
     check_lines(Action, X, andel1(X), Proof, Copied),
     (Copied = and(_,Action)).
 
+%% Matches and checks if negation elimination is done correctly
 check_rule(Nr, Action, negel(X, Y), Proof) :-
     (Nr > X), (Nr > Y),
     check_lines(Action, X, Y, negel(X,Y), Proof, Copy1, Copy2),
     ((Copy1 = neg(_A), Copy2 = _B) ; (Copy1 = _A, Copy2 = neg(_B))).
 
+%% Checks if contradiction is done correctly
 check_rule(Nr, Action, contel(X), Proof) :-
     (Nr > X),
     check_lines(Action, X, contel(X), Proof, Copied),
     Copied = cont, !.
     
+%% Checks if double negation is done correctly
 check_rule(Nr, Action, negnegint(X), Proof) :-
     (Nr > X),
     check_lines(Action, X, negnegint(X), Proof, Copied),
@@ -155,7 +158,7 @@ check_rule(Nr, Action, mt(X, Y), Proof) :-
     Copy1 = imp(_a, _b), 
     !.
 check_rule(Nr, Action, orint1(X), Proof) :-
-    not(Nr > X),
+    Nr > X,
     check_lines(Action, X, orint1(X), Proof, Copied),
     (Copied = or(Action, _) ; Copied = or(_, Action)), !.
 
