@@ -175,7 +175,7 @@ check_rule(Nr, Action, orint2(X), Proof) :-
     (Copied = or(Action, _) ; Copied = or(_, Action)), !.
 
 %% Checks if or elimination is done correctly
-check_rule(Nr, _, orel(R, X, Y, A, B), Proof) :-
+check_rule(Nr, Action, orel(R, X, Y, A, B), Proof) :-
     find_nth(R, Proof, First),
     find_nth(X, Proof, First1),
     find_nth(Y, Proof, Last1),
@@ -187,6 +187,7 @@ check_rule(Nr, _, orel(R, X, Y, A, B), Proof) :-
     nth0(1, Last1, Goal1),
     nth0(1, Last2, Goal2),
     Goal1 = Goal2,
+    Goal2 = Action,
     (or(Assumption1, Assumption2) = Prev ; or(Assumption2, Assumption1) = Prev),
     !.
 
